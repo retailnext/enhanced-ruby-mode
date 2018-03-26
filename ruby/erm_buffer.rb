@@ -393,7 +393,8 @@ class ErmBuffer
 
     def on_lbrace tok
       @cond_stack << false
-      if @ident then
+      is_start_of_line = @line_so_far.all? {|a| a[0] == :sp }
+      if @ident && !is_start_of_line then
         @brace_stack << :block
         indent :d
         r = add :block, tok

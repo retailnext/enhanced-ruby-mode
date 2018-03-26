@@ -136,7 +136,6 @@
 
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
-  :expected-result :failed
   (with-temp-enh-rb-string
    "x\n{\na: a,\nb: b\n}"
 

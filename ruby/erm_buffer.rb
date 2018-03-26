@@ -460,13 +460,9 @@ class ErmBuffer
     def on_period tok
       @mode ||= :period
 
-      indent :c, tok.size if tok == "\n"
-
-      if @ident
-        line_so_far_str = @line_so_far.map {|a| a[1] }.join
-        if line_so_far_str.strip == ""
-          indent :c, (line_so_far_str.length * -1)
-        end
+      is_start_of_line = @line_so_far.all? {|a| a[0] == :sp }
+      if is_start_of_line
+        indent :c, -@line_so_far.reduce(0) {|l, a| l + a[1].length }
       end
 
       add :rem, tok, tok.size, false, :cont

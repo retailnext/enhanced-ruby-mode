@@ -481,7 +481,7 @@ Warning: does not play well with electric-indent-mode.
             (start-process "erm-ruby-process"
                            nil
                            enh-ruby-program (concat (erm-source-dir)
-                                                    "ruby/erm.rb")))
+                                                    "erm.rb")))
       (set-process-coding-system erm-ruby-process 'utf-8 'utf-8)
       (set-process-filter erm-ruby-process 'erm-filter)
       (set-process-query-on-exit-flag erm-ruby-process nil)

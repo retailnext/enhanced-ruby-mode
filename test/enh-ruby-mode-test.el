@@ -380,6 +380,38 @@ end
       end
 "))))
 
+(ert-deftest enh-ruby-dont-deep-indent-eol-opening ()
+  (with-temp-enh-rb-string
+   "
+foo(:bar,
+:baz)
+foo(
+:bar,
+:baz,
+)
+[:foo,
+:bar]
+[
+:foo,
+:bar
+]"
+
+   (let ((enh-ruby-deep-indent-paren t))
+     (indent-region (point-min) (point-max))
+     (buffer-should-equal
+      "
+foo(:bar,
+    :baz)
+foo(
+  :bar,
+  :baz,
+)
+[:foo,
+ :bar]
+[
+  :foo,
+  :bar
+]"))))
 
 (ert-deftest enh-ruby-indent-if-in-assignment ()
   (with-temp-enh-rb-string

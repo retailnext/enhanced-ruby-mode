@@ -21,7 +21,10 @@
 
 (ert-deftest enh-ruby-backward-sexp-test ()
   (with-temp-enh-rb-string
-   "def foo\n  xxx\nend\n"
+   "def foo
+  xxx
+end
+"
 
    (end-of-buffer)
    (enh-ruby-backward-sexp 1)
@@ -30,7 +33,10 @@
 (ert-deftest enh-ruby-backward-sexp-test-inner ()
   :expected-result :failed
   (with-temp-enh-rb-string
-   "def backward_sexp\n  \"string #{expr \"another\"} word\"\nend\n"
+   "def backward_sexp
+  \"string #{expr \"another\"} word\"
+end
+"
 
    (search-forward " word")
    (move-end-of-line nil)
@@ -39,7 +45,14 @@
 
 (ert-deftest enh-ruby-forward-sexp-test ()
   (with-temp-enh-rb-string
-   "def foo\n  xxx\n end\n\ndef backward_sexp\n  xxx\nend\n"
+   "def foo
+  xxx
+ end
+
+def backward_sexp
+  xxx
+end
+"
 
    (beginning-of-buffer)
    (enh-ruby-forward-sexp 1)
@@ -48,7 +61,9 @@
 
 (ert-deftest enh-ruby-up-sexp-test ()
   (with-temp-enh-rb-string
-   "def foo\n  %_bosexp#{sdffd} test1_[1..4].si\nend"
+   "def foo
+  %_bosexp#{sdffd} test1_[1..4].si
+end"
 
    (search-forward "test1_")
    (enh-ruby-up-sexp)
@@ -56,14 +71,22 @@
 
 (ert-deftest enh-ruby-indent-trailing-dots ()
   (with-temp-enh-rb-string
-   "a.b.\nc\n"
+   "a.b.
+c
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "a.b.\n  c\n")))
+   (buffer-should-equal "a.b.
+  c
+")))
 
 (ert-deftest enh-ruby-end-of-defun ()
   (with-temp-enh-rb-string
-   "class Class\ndef method\n# blah\nend # method\nend # class"
+   "class Class
+def method
+# blah
+end # method
+end # class"
 
    (search-forward "blah")
    (enh-ruby-end-of-defun)
@@ -71,7 +94,11 @@
 
 (ert-deftest enh-ruby-end-of-block ()
   (with-temp-enh-rb-string
-   "class Class\ndef method\n# blah\nend # method\nend # class"
+   "class Class
+def method
+# blah
+end # method
+end # class"
 
    (search-forward "blah")
    (enh-ruby-end-of-block)
@@ -79,80 +106,149 @@
 
 (ert-deftest enh-ruby-indent-leading-dots ()
   (with-temp-enh-rb-string
-   "d.e\n.f\n"
+   "d.e
+.f
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "d.e\n  .f\n")))
+   (buffer-should-equal "d.e
+  .f
+")))
 
 (ert-deftest enh-ruby-indent-leading-dots-ident ()
   (with-temp-enh-rb-string
-   "b\n.c\n.d\n"
+   "b
+.c
+.d
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "b\n  .c\n  .d\n")))
+   (buffer-should-equal "b
+  .c
+  .d
+")))
 
 (ert-deftest enh-ruby-indent-leading-dots-ivar ()
   (with-temp-enh-rb-string
-   "@b\n.c\n.d\n"
+   "@b
+.c
+.d
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "@b\n  .c\n  .d\n")))
+   (buffer-should-equal "@b
+  .c
+  .d
+")))
 
 (ert-deftest enh-ruby-indent-leading-dots-gvar ()
   (with-temp-enh-rb-string
-   "$b\n.c\n.d\n"
+   "$b
+.c
+.d
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "$b\n  .c\n  .d\n")))
+   (buffer-should-equal "$b
+  .c
+  .d
+")))
 
 (ert-deftest enh-ruby-indent-leading-dots-cvar ()
   (with-temp-enh-rb-string
-   "@@b\n.c\n.d\n"
+   "@@b
+.c
+.d
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "@@b\n  .c\n  .d\n")))
+   (buffer-should-equal "@@b
+  .c
+  .d
+")))
 
 (ert-deftest enh-ruby-indent-pct-w-array ()
   (with-temp-enh-rb-string
-   "words = %w[\nmoo\n]\n"
+   "words = %w[
+moo
+]
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "words = %w[\n         moo\n        ]\n")))
+   (buffer-should-equal "words = %w[
+         moo
+        ]
+")))
 
 (ert-deftest enh-ruby-indent-array-of-strings ()
   (with-temp-enh-rb-string
-   "words = [\n'moo'\n]\n"
+   "
+words = ['cow',
+'moo'
+]
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "words = [\n         'moo'\n        ]\n")))
+   (buffer-should-equal "
+words = ['cow',
+         'moo'
+        ]
+")))
 
 (ert-deftest enh-ruby-indent-hash ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   (with-temp-enh-rb-string
-   "{\na: a,\nb: b\n}\n"
+   "
+{
+a: a,
+b: b
+}
+"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "{\n a: a,\n b: b\n}\n")))
+   (buffer-should-equal "
+{
+  a: a,
+  b: b
+}
+")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   (with-temp-enh-rb-string
-   "x\n{\na: a,\nb: b\n}"
+   "
+x
+{
+a: a,
+b: b
+}"
 
    (indent-region (point-min) (point-max))
-   (buffer-should-equal "x\n{\n a: a,\n b: b\n}")))
+   (buffer-should-equal "
+x
+{
+  a: a,
+  b: b
+}")))
 
 (defun toggle-to-do ()
   (enh-ruby-toggle-block)
-  (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"))
+  (buffer-should-equal "7.times do |i|
+  puts \"number #{i+1}\"
+end
+"))
 
 (defun toggle-to-brace ()
   (enh-ruby-toggle-block)
-  (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n"))
+  (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }
+"))
 
 (ert-deftest enh-ruby-toggle-block/both ()
   (with-temp-enh-rb-string
-   "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
+   "7.times { |i|
+  puts \"number #{i+1}\"
+}
+"
 
    (toggle-to-do)
    (toggle-to-brace)))
@@ -160,73 +256,176 @@
 (ert-deftest enh-ruby-toggle-block/brace ()
   :expected-result t ; https://github.com/zenspider/enhanced-ruby-mode/issues/132
   (with-temp-enh-rb-string
-   "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
+   "7.times { |i|
+  puts \"number #{i+1}\"
+}
+"
 
    (toggle-to-do)))
 
 (ert-deftest enh-ruby-toggle-block/do ()
   (with-temp-enh-rb-string
-   "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"
+   "7.times do |i|
+  puts \"number #{i+1}\"
+end
+"
 
    (toggle-to-brace)))
 
 (ert-deftest enh-ruby-indent-heredocs-test/unset ()
   (with-temp-enh-rb-string
-   "meth <<-DONE\n  a b c\nd e f\nDONE\n"
+   "meth <<-DONE
+  a b c
+d e f
+DONE
+"
 
    (search-forward "d e f")
    (move-beginning-of-line nil)
    (indent-for-tab-command)             ; hitting TAB char
-   (buffer-should-equal "meth <<-DONE\n  a b c\nd e f\nDONE\n")))
+   (buffer-should-equal "meth <<-DONE
+  a b c
+d e f
+DONE
+")))
 
 (ert-deftest enh-ruby-indent-heredocs-test/on ()
   (with-temp-enh-rb-string
-   "meth <<-DONE\n  a b c\nd e f\nDONE\n"
+   "meth <<-DONE
+  a b c
+d e f
+DONE
+"
 
    (search-forward "d e f")
    (move-beginning-of-line nil)
    (let ((enh-ruby-preserve-indent-in-heredocs t))
      (indent-for-tab-command)           ; hitting TAB char
-     (buffer-should-equal "meth <<-DONE\n  a b c\n  d e f\nDONE\n"))))
+     (buffer-should-equal "meth <<-DONE
+  a b c
+  d e f
+DONE
+"))))
 
 (ert-deftest enh-ruby-indent-heredocs-test/off ()
   (with-temp-enh-rb-string
-   "meth <<-DONE\n  a b c\nd e f\nDONE\n"
+   "meth <<-DONE
+  a b c
+d e f
+DONE
+"
 
    (search-forward "d e f")
    (move-beginning-of-line nil)
    (let ((enh-ruby-preserve-indent-in-heredocs nil))
      (indent-for-tab-command)           ; hitting TAB char
-     (buffer-should-equal "meth <<-DONE\n  a b c\nd e f\nDONE\n"))))
+     (buffer-should-equal "meth <<-DONE
+  a b c
+d e f
+DONE
+"))))
 
 (ert-deftest enh-ruby-deep-indent-def-after-private ()
   (with-temp-enh-rb-string
-   "class Foo\nprivate def foo\nx\nend\nend\n"
+   "class Foo
+private def foo
+x
+end
+end
+"
 
    (let ((enh-ruby-deep-indent-construct t))
      (indent-region (point-min) (point-max))
-     (buffer-should-equal "class Foo\n  private def foo\n            x\n          end\nend\n"))))
+     (buffer-should-equal "class Foo
+  private def foo
+            x
+          end
+end
+"))))
 
 (ert-deftest enh-ruby-indent-def-after-private ()
   (with-temp-enh-rb-string
-   "class Foo\nprivate def foo\nx\nend\nend\n"
+   "class Foo
+private def foo
+x
+end
+end
+"
 
    (let ((enh-ruby-deep-indent-construct nil))
      (indent-region (point-min) (point-max))
-     (buffer-should-equal "class Foo\n  private def foo\n    x\n  end\nend\n"))))
+     (buffer-should-equal "class Foo
+  private def foo
+    x
+  end
+end
+"))))
 
 (ert-deftest enh-ruby-deep-indent-if-in-assignment ()
   (with-temp-enh-rb-string
-   "foo = if bar\nx\nelse\ny\nend\n"
+   "foo = if bar
+x
+else
+y
+end
+"
 
    (let ((enh-ruby-deep-indent-construct t))
      (indent-region (point-min) (point-max))
-     (buffer-should-equal "foo = if bar\n        x\n      else\n        y\n      end\n"))))
+     (buffer-should-equal "foo = if bar
+        x
+      else
+        y
+      end
+"))))
+
+(ert-deftest enh-ruby-dont-deep-indent-eol-opening ()
+  (with-temp-enh-rb-string
+   "
+foo(:bar,
+:baz)
+foo(
+:bar,
+:baz,
+)
+[:foo,
+:bar]
+[
+:foo,
+:bar
+]"
+
+   (let ((enh-ruby-deep-indent-paren t))
+     (indent-region (point-min) (point-max))
+     (buffer-should-equal
+      "
+foo(:bar,
+    :baz)
+foo(
+  :bar,
+  :baz,
+)
+[:foo,
+ :bar]
+[
+  :foo,
+  :bar
+]"))))
 
 (ert-deftest enh-ruby-indent-if-in-assignment ()
   (with-temp-enh-rb-string
-   "foo = if bar\nx\nelse\ny\nend\n"
+   "foo = if bar
+x
+else
+y
+end
+"
 
    (let ((enh-ruby-deep-indent-construct nil))
      (indent-region (point-min) (point-max))
-     (buffer-should-equal "foo = if bar\n  x\nelse\n  y\nend\n"))))
+     (buffer-should-equal "foo = if bar
+  x
+else
+  y
+end
+"))))
